@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: iyi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12341234
+
+  redis:
+    image: redis:6-alpine
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: behrouzios@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 12341234
+    depends_on:
+      - external_db
+
+  external_db:
+    image: postgres:15
+    volumes:
+      - external_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: iyi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12341234
+    ports:
+      - "5433:5432"
+
+  web:
+    build:
+      context: .
+      dockerfile: iyi/Dockerfile
+    command: gunicorn iyi.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./financial_project:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+      - external_db
+    environment:
+      - DEBUG=1
+      - DATABASE_URL=postgres://postgres:12341234@db:5432/iyi
+      - EXTERNAL_DATABASE_URL=postgres://postgres:external123@external_db:5432/external_db
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/static
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  external_postgres_data:
+  static_volume:

@@ -1,0 +1,16 @@
+{
+  "dcs1h_chart_data": [{
+                    'icon': 'tank4.png',
+                    'persian': 'نمودار های یک ساعنه - میله ای',
+                    'icon': 'process.png',
+                    'report_type': 'chart_view',
+                    'chart_type': 'bar',
+                    'table': 'dcs1h',
+                    'x_axis': 'date',
+                    'y_axis': 'v24',
+                    'function': 'sum',
+                    'order_by': 'date',
+                    'y_axis_title': 'تن',}]
+
+
+}
